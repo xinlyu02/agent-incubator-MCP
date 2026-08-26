@@ -1,0 +1,18 @@
+---
+applications:
+  - name: incubator-mcp           # TODO: BTP owner — confirm app name
+    memory: 256M
+    instances: 1
+    buildpacks:
+      - nodejs_buildpack
+    command: node dist/server.js
+    routes:
+      - route: incubator-mcp.cfapps.<region>.hana.ondemand.com  # TODO: BTP owner — CF region + route
+
+    env:
+      NODE_ENV: production
+      AUTH_MODE: xsuaa             # switch from mock to xsuaa for production
+      INCUBATOR_BASE_URL: https://agent-factory-console.cfapps.<region>.hana.ondemand.com  # TODO: BTP owner
+
+    services:
+      - incubator-mcp-xsuaa        # TODO: BTP owner — XSUAA service instance name
