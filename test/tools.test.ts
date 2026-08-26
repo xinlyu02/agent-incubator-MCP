@@ -58,9 +58,10 @@ afterAll(async () => {
   mockProc.kill();
 });
 
-function parseText(result: Awaited<ReturnType<typeof client.callTool>>): unknown {
-  const c = result.content[0] as { type: string; text: string };
-  return JSON.parse(c.text);
+type ToolResult = { content: Array<{ type: string; text: string }>; isError?: boolean };
+
+function parseText(result: ToolResult): unknown {
+  return JSON.parse(result.content[0].text);
 }
 
 describe("search_ideas", () => {
@@ -127,10 +128,9 @@ describe("get_idea_detail", () => {
     expect(data.questionnaire).toBeNull();
   });
 
-  it("throws for a non-existent idea id", async () => {
-    await expect(
-      client.callTool({ name: "get_idea_detail", arguments: { id: "does-not-exist" } })
-    ).rejects.toThrow();
+  it("returns isError for a non-existent idea id", async () => {
+    const result = await client.callTool({ name: "get_idea_detail", arguments: { id: "does-not-exist" } });
+    expect((result as { isError?: boolean }).isError).toBe(true);
   });
 });
 
