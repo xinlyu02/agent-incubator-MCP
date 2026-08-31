@@ -12,7 +12,7 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok", service: "incubator-mcp" });
 });
 
-app.post("/mcp", async (req, res) => {
+async function handleMcp(req: express.Request, res: express.Response): Promise<void> {
   try {
     const incomingToken = (req.headers.authorization ?? "").replace(/^Bearer\s+/i, "");
     const bearerToken = await exchangeToken(incomingToken);
@@ -26,7 +26,10 @@ app.post("/mcp", async (req, res) => {
     const msg = err instanceof Error ? err.message : "Internal server error";
     if (!res.headersSent) res.status(500).json({ error: msg });
   }
-});
+}
+
+app.post("/mcp", handleMcp);
+app.get("/mcp", handleMcp);
 
 app.listen(config.port, () => console.log(`incubator-mcp listening on :${config.port}`));
 

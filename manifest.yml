@@ -1,18 +1,22 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# After deploying, create a Destination in BTP Cockpit:
+#   Name:                agent-incubator-mcp
+#   URL:                 https://agent-incubator-mcp.cfapps.eu12.hana.ondemand.com
+#   Authentication:      OAuth2JWTBearer  (forwards the Joule user token)
+#   Additional Property: sap-joule-studio-mcp-server = true  ← required for Joule Work Desktop
+# ─────────────────────────────────────────────────────────────────────────────
 ---
 applications:
-  - name: incubator-mcp           # TODO: BTP owner — confirm app name
+  - name: agent-incubator-mcp
     memory: 256M
     instances: 1
     buildpacks:
       - nodejs_buildpack
     command: node dist/server.js
     routes:
-      - route: incubator-mcp.cfapps.<region>.hana.ondemand.com  # TODO: BTP owner — CF region + route
+      - route: agent-incubator-mcp.cfapps.eu12.hana.ondemand.com
 
     env:
       NODE_ENV: production
-      AUTH_MODE: xsuaa             # switch from mock to xsuaa for production
-      INCUBATOR_BASE_URL: https://agent-factory-console.cfapps.<region>.hana.ondemand.com  # TODO: BTP owner
-
-    services:
-      - incubator-mcp-xsuaa        # TODO: BTP owner — XSUAA service instance name
+      AUTH_MODE: passthrough
+      INCUBATOR_BASE_URL: https://coe-gc-shared-hanacloud-dev-afc-srv.cfapps.eu12.hana.ondemand.com

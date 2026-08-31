@@ -51,6 +51,13 @@ export interface NormalizedDashboard {
   liveIdeas: number;
   byStage: Array<{ stageIndex: number; stage: string; count: number }>;
   totalTeamMembers: number;
+  // Real Incubator API fields (present when connected to actual service)
+  liveTarget?: number;
+  nominatedCF?: number;
+  nominatedIE?: number;
+  customersTouched?: number;
+  gtmCount?: number;
+  activeCount?: number;
 }
 
 type Raw = Record<string, unknown>;

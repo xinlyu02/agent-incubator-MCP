@@ -1,3 +1,5 @@
+import { config } from "../config.js";
+
 type Raw = Record<string, unknown>;
 
 export class IncubatorClient {
@@ -7,11 +9,11 @@ export class IncubatorClient {
   ) {}
 
   private async get(path: string): Promise<Raw> {
+    const authHeader = config.incubatorBasicAuth
+      ? `Basic ${Buffer.from(config.incubatorBasicAuth).toString("base64")}`
+      : `Bearer ${this.bearerToken}`;
     const res = await fetch(`${this.baseUrl}${path}`, {
-      headers: {
-        Authorization: `Bearer ${this.bearerToken}`,
-        Accept: "application/json",
-      },
+      headers: { Authorization: authHeader, Accept: "application/json" },
     });
     if (!res.ok) {
       throw new Error(
@@ -27,12 +29,12 @@ export class IncubatorClient {
     skip?: number;
     count?: boolean;
   }): Promise<Raw> {
-    const qs = new URLSearchParams();
-    if (params.filter) qs.set("$filter", params.filter);
-    if (params.top !== undefined) qs.set("$top", String(params.top));
-    if (params.skip !== undefined) qs.set("$skip", String(params.skip));
-    if (params.count) qs.set("$count", "true");
-    const q = qs.toString();
+    const parts: string[] = [];
+    if (params.filter) parts.push(`$filter=${encodeURIComponent(params.filter)}`);
+    if (params.top !== undefined) parts.push(`$top=${params.top}`);
+    if (params.skip !== undefined) parts.push(`$skip=${params.skip}`);
+    if (params.count) parts.push(`$count=true`);
+    const q = parts.join("&");
     return this.get(`/api/console/Ideas${q ? `?${q}` : ""}`);
   }
 
